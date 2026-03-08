@@ -1,2 +1,110 @@
-# paper-boy
-Customize your very own AI-powered newsletters based on your personal interests
+# Newsletter System — Project README
+
+> **Read this file first** when starting a new session involving newsletters.
+> It contains everything you need to understand the project structure, conventions, and how to make changes.
+
+---
+
+## Overview
+
+This is a weekly newsletter generation system. A scheduled task runs every Saturday at 6am, searches the web for current news on a given topic, compiles it into a rich HTML newsletter, and (optionally) emails it to Harry.
+
+The system is designed to support **multiple newsletters** with shared rules. Right now there's one — **Eorzea Weekly** (FFXIV news) — but the architecture supports adding more topics easily.
+
+## Folder Structure
+
+```
+Newsletters/
+├── README.md                  ← You are here. Project context and conventions.
+├── config/
+│   ├── shared.md              ← Universal rules: date handling, recency enforcement,
+│   │                             writing style, image handling,
+│   │                             email delivery, verification checklist.
+│   │                             ALL newsletters inherit these rules.
+│   ├── ffxiv.md               ← FFXIV-specific: search queries, trusted sources,
+│   │                             section structure, tag categories, intro style.
+│   └── (future topic configs go here)
+├── templates/
+│   ├── mothercrystal.html     ← "Style C" — dark blue/cyan/purple Hydaelyn crystal theme.
+│   │                             Used by the FFXIV newsletter.
+│   └── (future templates go here)
+├── output/
+│   ├── eorzea-weekly-latest.html    ← Most recent newsletter (overwritten each week)
+│   └── eorzea-weekly-YYYY-MM-DD.html ← Dated archive copies
+└── .gmail-credentials         ← (Optional) Gmail App Password for email delivery.
+                                  Line 1: sender email, Line 2: app password.
+                                  If this file doesn't exist, email is skipped silently.
+```
+
+## Scheduled Tasks
+
+| Task ID | Schedule | Purpose |
+|---------|----------|---------|
+| `eorzea-weekly-newsletter` | Saturdays @ 6am | Generate and (optionally) email the FFXIV newsletter |
+| `test-newsletter` | Manual only | Test run — generates newsletter without emailing or overwriting latest |
+
+The scheduled task prompts are intentionally minimal — they just read the config files and follow them. All real logic lives in the config files above.
+
+### Running a Test
+
+To do a dry run anytime: go to the "Scheduled" section in the Cowork sidebar and manually trigger `test-newsletter`. It generates `output/eorzea-weekly-test.html` without sending email or overwriting the production `latest.html` file, and provides a summary of what it found and any issues.
+
+## How Things Work
+
+### Adding a New Newsletter
+
+1. Create a new topic config: `config/{topic}.md` (follow `ffxiv.md` as a template)
+2. Choose or create an HTML template in `templates/`
+3. Create a new scheduled task that reads `config/shared.md` + your new topic config + the template
+4. The new newsletter inherits all shared rules (recency, style, verification) automatically
+
+### Editing an Existing Newsletter
+
+- **Change search queries or sources:** Edit the topic config (e.g., `config/ffxiv.md`)
+- **Change writing style, recency rules, or shared behavior:** Edit `config/shared.md`
+- **Change the visual design:** Edit the template in `templates/`
+- **Change the schedule:** Update the scheduled task via the Cowork scheduled tasks UI
+
+All changes take effect on the next scheduled run — no redeployment needed.
+
+### Key Design Decisions
+
+- **Single source of truth:** The config files ARE the instructions. The scheduled task prompt just points to them. No duplication.
+- **Strict recency enforcement:** The shared config has non-negotiable rules about only using content from the last 8 days, verified by publication date. This prevents hallucinated or outdated content.
+- **No training data for content:** The task is explicitly told it has ZERO reliable knowledge about any topic and must source everything from live web searches.
+- **Graceful degradation:** If a section has no real news, it says "quiet week" rather than fabricating. If email credentials don't exist, it just saves the HTML file.
+
+## Newsletter Sections (FFXIV)
+
+The FFXIV newsletter has these sections (in order):
+1. **Lead Story** — The biggest news of the week with featured image
+2. **This Week in Eorzea** — 3-4 news briefs with category tags (cyan/amber/emerald/rose)
+3. **Quote of the Week** — A notable quote from devs, creators, articles, or community (broadened to make it easier to fill)
+4. **Hot on r/ffxiv** — 3-5 top Reddit threads with vote counts and links
+5. **YouTube Roundup** — 3-5 videos from preferred creators with embedded YouTube players (prioritizes informational/lore content from Meoni, Desperius, AvvyCatte, Mr Happy, Zepla, Ethys Asher, etc.)
+6. **Community Highlights** — 4-card grid (fan art, video, stats, hot thread)
+
+## Style Options Created
+
+During initial design, 5 newsletter styles were prototyped. The sample files (ffxiv-newsletter-style-{a-e}.html) in the root folder are these prototypes. Style C (Mothercrystal) was chosen for FFXIV. The others can be adapted for future newsletters:
+
+- **Style A** — Clean & Editorial (light, minimal, Morning Brew inspired)
+- **Style B** — Rich & Visual (dark, purple gradients, gaming magazine feel)
+- **Style C** — Mothercrystal / Hydaelyn (deep blues, crystal SVG, ethereal) ✅ Active
+- **Style D** — Adventurers' Guild / Parchment (gold, serif, leve-card layout)
+- **Style E** — Dawntrail / Tural Sunset (warm sunset gradients, rose/orange/amber)
+
+## Email Setup
+
+To enable email delivery:
+1. Go to Google Account → Security → 2-Step Verification → App Passwords
+2. Create an app password for "Mail"
+3. Create `.gmail-credentials` in this folder:
+   ```
+   youremail@gmail.com
+   your-16-char-app-password
+   ```
+
+## Recipient
+
+Harry — hfleming42@gmail.com
