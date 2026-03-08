@@ -7,7 +7,7 @@
 
 ## Overview
 
-This is a weekly newsletter generation system. A scheduled task runs every Saturday at 6am, searches the web for current news on a given topic, compiles it into a rich HTML newsletter, and (optionally) emails it to Harry.
+This is a newsletter generation system. Run `/generate-newsletter <topic>` to search the web for current news on a given topic and compile it into a rich HTML newsletter.
 
 The system is designed to support **multiple newsletters** with shared rules. Right now there's one — **Eorzea Weekly** (FFXIV news) — but the architecture supports adding more topics easily.
 
@@ -36,18 +36,14 @@ Newsletters/
                                   If this file doesn't exist, email is skipped silently.
 ```
 
-## Scheduled Tasks
+## Running a Newsletter
 
-| Task ID | Schedule | Purpose |
-|---------|----------|---------|
-| `eorzea-weekly-newsletter` | Saturdays @ 6am | Generate and (optionally) email the FFXIV newsletter |
-| `test-newsletter` | Manual only | Test run — generates newsletter without emailing or overwriting latest |
+```
+/generate-newsletter ffxiv        # normal run, writes to output/
+/generate-newsletter ffxiv test   # dry run, writes to output/ffxiv-test.html only
+```
 
-The scheduled task prompts are intentionally minimal — they just read the config files and follow them. All real logic lives in the config files above.
-
-### Running a Test
-
-To do a dry run anytime: go to the "Scheduled" section in the Cowork sidebar and manually trigger `test-newsletter`. It generates `output/eorzea-weekly-test.html` without sending email or overwriting the production `latest.html` file, and provides a summary of what it found and any issues.
+The test mode generates output without overwriting the production `latest.html` file, and provides a summary of what it found and any issues.
 
 ## How Things Work
 
@@ -55,17 +51,14 @@ To do a dry run anytime: go to the "Scheduled" section in the Cowork sidebar and
 
 1. Create a new topic config: `config/{topic}.md` (follow `ffxiv.md` as a template)
 2. Choose or create an HTML template in `templates/`
-3. Create a new scheduled task that reads `config/shared.md` + your new topic config + the template
-4. The new newsletter inherits all shared rules (recency, style, verification) automatically
+3. Run `/generate-newsletter {topic}` — it inherits all shared rules automatically
 
 ### Editing an Existing Newsletter
 
 - **Change search queries or sources:** Edit the topic config (e.g., `config/ffxiv.md`)
 - **Change writing style, recency rules, or shared behavior:** Edit `config/shared.md`
 - **Change the visual design:** Edit the template in `templates/`
-- **Change the schedule:** Update the scheduled task via the Cowork scheduled tasks UI
-
-All changes take effect on the next scheduled run — no redeployment needed.
+All changes take effect on the next run.
 
 ### Key Design Decisions
 
@@ -94,17 +87,3 @@ During initial design, 5 newsletter styles were prototyped. The sample files (ff
 - **Style D** — Adventurers' Guild / Parchment (gold, serif, leve-card layout)
 - **Style E** — Dawntrail / Tural Sunset (warm sunset gradients, rose/orange/amber)
 
-## Email Setup
-
-To enable email delivery:
-1. Go to Google Account → Security → 2-Step Verification → App Passwords
-2. Create an app password for "Mail"
-3. Create `.gmail-credentials` in this folder:
-   ```
-   youremail@gmail.com
-   your-16-char-app-password
-   ```
-
-## Recipient
-
-Harry — hfleming42@gmail.com

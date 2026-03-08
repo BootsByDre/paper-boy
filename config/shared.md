@@ -38,17 +38,6 @@ For each search query:
 - When no image is available, use the emoji placeholder div from the template.
 - Never hotlink from sites known to block it. Prefer: Lodestone, imgur, YouTube thumbnail URLs (`https://img.youtube.com/vi/VIDEO_ID/hqdefault.jpg`).
 
-## Email Delivery
-
-If a credentials file exists at the path specified in the topic config, send the newsletter as an HTML email using Python's smtplib over SMTP_SSL (port 465) to Gmail. The credentials file format is:
-
-```
-sender_email@gmail.com
-app-password-here
-```
-
-If the credentials file does not exist, skip email delivery silently and just save the HTML file.
-
 ## Output
 
 - Save the newsletter HTML to the output path specified in the topic config.
