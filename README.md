@@ -77,13 +77,4 @@ The FFXIV newsletter has these sections (in order):
 5. **YouTube Roundup** — 3-5 videos from preferred creators with embedded YouTube players (prioritizes informational/lore content from Meoni, Desperius, AvvyCatte, Mr Happy, Zepla, Ethys Asher, etc.)
 6. **Community Highlights** — 4-card grid (fan art, video, stats, hot thread)
 
-## Style Options Created
-
-During initial design, 5 newsletter styles were prototyped. The sample files (ffxiv-newsletter-style-{a-e}.html) in the root folder are these prototypes. Style C (Mothercrystal) was chosen for FFXIV. The others can be adapted for future newsletters:
-
-- **Style A** — Clean & Editorial (light, minimal, Morning Brew inspired)
-- **Style B** — Rich & Visual (dark, purple gradients, gaming magazine feel)
-- **Style C** — Mothercrystal / Hydaelyn (deep blues, crystal SVG, ethereal) ✅ Active
-- **Style D** — Adventurers' Guild / Parchment (gold, serif, leve-card layout)
-- **Style E** — Dawntrail / Tural Sunset (warm sunset gradients, rose/orange/amber)
 
